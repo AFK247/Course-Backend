@@ -6,6 +6,7 @@ import { ReviewControllers } from './review.controller';
 
 const router = express.Router();
 
+//review route
 router.post(
   '/',
   validateRequest(reviewValidationSchema.createReviewValidationSchema),

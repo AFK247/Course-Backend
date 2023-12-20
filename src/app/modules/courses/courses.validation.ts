@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+//validation
 export const createCourseValidationSchema = z.object({
   body: z.object({
     title: z.string({
