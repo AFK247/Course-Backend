@@ -18,7 +18,7 @@ const createCourseIntoDB = async (payload: TCourse) => {
 };
 
 const getAllCoursesFromDB = async (query: Record<string, unknown>) => {
-  const queryObj = { ...query }; // copying req.query object so that we can mutate the copy object
+  const tempQuery = { ...query };
 
   const excludeFields = [
     'sortBy',
@@ -30,26 +30,22 @@ const getAllCoursesFromDB = async (query: Record<string, unknown>) => {
     'endDate',
     'sortOrder',
   ];
-  excludeFields.forEach((el) => delete queryObj[el]); // DELETING THE FIELDS SO THAT IT CAN'T MATCH OR FILTER EXACTLY
+  excludeFields.forEach((el) => delete tempQuery[el]);
 
-  if (queryObj.tags) {
-    queryObj['tags.name'] = queryObj.tags;
+  if (tempQuery.tags) {
+    tempQuery['tags.name'] = tempQuery.tags;
   }
 
-  if (queryObj.level) {
-    queryObj['details.level'] = queryObj.level;
+  if (tempQuery.level) {
+    tempQuery['details.level'] = tempQuery.level;
   }
 
-  delete queryObj['tags'];
-  delete queryObj['level'];
+  delete tempQuery['tags'];
+  delete tempQuery['level'];
 
-  const filterQuery = Course.find(queryObj);
+  const filterQuery = Course.find(tempQuery);
 
-  // SORTING FUNCTIONALITY:
-
-  let sort = '-createdAt'; // SET DEFAULT VALUE
-
-  // IF sort  IS GIVEN SET IT
+  let sort = '-createdAt';
 
   if (query.sortBy) {
     if (query.sortOrder === 'asc') {
@@ -59,10 +55,8 @@ const getAllCoursesFromDB = async (query: Record<string, unknown>) => {
 
   const sortQuery = filterQuery.sort(sort);
 
-  // PAGINATION FUNCTIONALITY:
-
-  let page = 1; // SET DEFAULT VALUE FOR PAGE
-  let limit = 5; // SET DEFAULT VALUE FOR LIMIT
+  let page = 1;
+  let limit = 10;
 
   if (query.limit) {
     limit = Number(query.limit);
@@ -92,7 +86,6 @@ const getAllCoursesFromDB = async (query: Record<string, unknown>) => {
   };
 
   const dateRangeQuery = await priceRangeQuery.find(rangeDateQuery);
-  // const limitQuery = await dateRangeQuery.limit(limit);
 
   const limited = dateRangeQuery.slice(0, limit);
 
@@ -119,7 +112,6 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
   }
 
   if (tags && tags.length > 0) {
-    // filter out the deleted fields
     const deletedCourse = tags
       .filter((el) => el.name && el.isDeleted)
       .map((el) => el.name);
@@ -141,7 +133,6 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course!');
     }
 
-    // filter out the new course fields
     const newCourse = tags?.filter((el) => el.name && !el.isDeleted);
 
     const newCourses = await Course.findByIdAndUpdate(
@@ -181,9 +172,6 @@ const getCourseByIDAndReviewsFromDb = async (id: string) => {
 };
 
 const getBestCourseFromDb = async () => {
-  // const resultCourse = await Course.findById(id);
-  // const resultReview = await Review.find({ courseId: id });
-
   const bestReview: any = await Review.aggregate([
     {
       $group: {
