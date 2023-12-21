@@ -165,7 +165,7 @@ const getCourseByIDAndReviewsFromDb = async (id: string) => {
   const result = resultCourse?.toObject();
 
   const sendData = {
-    ...result,
+    course: result,
     reviews: resultReview,
   };
   return sendData;
@@ -197,7 +197,7 @@ const getBestCourseFromDb = async () => {
   const temp = resultCourse?.toObject();
 
   const resData = {
-    ...temp,
+    course: temp,
     averageRating: bestReview[0]?.averageRating,
     reviewCount: bestReview[0]?.reviewCount,
   };
