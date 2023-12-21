@@ -5,6 +5,7 @@ import config from './app/config';
 
 let server: Server;
 
+//main function
 async function main() {
   try {
     await mongoose.connect(config.database_url as string);
@@ -19,6 +20,7 @@ async function main() {
 
 main();
 
+//Gracefully shutting down
 process.on('unhandledRejection', () => {
   console.log(`UnahandledRejection Detected , Shutting Down`);
   if (server) {
@@ -29,6 +31,7 @@ process.on('unhandledRejection', () => {
   process.exit(1);
 });
 
+//Instantly shutting down
 process.on('uncaughtException', () => {
   console.log(`UncaughtException Detected , Shutting Down`);
   process.exit(1);
