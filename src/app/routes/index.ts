@@ -20,6 +20,7 @@ const moduleRoutes = [
   },
 ];
 
+//To avoid repetitive code
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
 
 export default router;
