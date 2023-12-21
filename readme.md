@@ -11,3 +11,5 @@ Follow this to run project locally
 ## start the app:
 
 `npm run start:dev`
+
+Also Make sure you have the latest version of Node Js installed
